@@ -50,9 +50,7 @@ public class DiskBasedCache implements Cache {
 
     @Override
     public void put(String key, Entry entry) {
-        String string = new String(entry.data);
-        mMemoryCache.put(key, string);
-        int size = mMemoryCache.size();
+        mMemoryCache.put(key, new String(entry.data));
     }
 
 }
