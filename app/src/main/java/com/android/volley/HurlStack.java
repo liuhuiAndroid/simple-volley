@@ -37,7 +37,7 @@ public class HurlStack implements HttpStack {
             baos.close();
 
             byte[] responseContent = baos.toByteArray();
-            return new NetworkResponse(responseContent, responseCode);
+            return new NetworkResponse(responseContent);
         } else {
             return null;
         }

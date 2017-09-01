@@ -8,7 +8,7 @@ public class NetworkResponse {
 
     public final byte[] data;
 
-    public NetworkResponse(byte[] data, int responseCode) {
+    public NetworkResponse(byte[] data) {
         this.data = data;
     }
 }

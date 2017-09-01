@@ -16,16 +16,22 @@ public class RequestQueue {
 
     private final ResponseDelivery mDelivery;
 
+    private final PriorityBlockingQueue<Request<?>> mCacheQueue =
+            new PriorityBlockingQueue<Request<?>>();
+
     private final PriorityBlockingQueue<Request<?>> mNetworkQueue =
             new PriorityBlockingQueue<Request<?>>();
 
+    private final Cache mCache;
+
     private AtomicInteger mSequenceGenerator = new AtomicInteger();
 
-    public RequestQueue(Network network) {
-        this(network,new ExecutorDelivery(new Handler(Looper.getMainLooper())));
+    public RequestQueue(Cache cache, Network network) {
+        this(cache, network, new ExecutorDelivery(new Handler(Looper.getMainLooper())));
     }
 
-    public RequestQueue(Network network, ResponseDelivery delivery) {
+    public RequestQueue(Cache cache, Network network, ResponseDelivery delivery) {
+        mCache = cache;
         mNetwork = network;
         mDelivery = delivery;
     }
@@ -34,7 +40,10 @@ public class RequestQueue {
 
         stop();
 
-        NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork, mDelivery);
+        CacheDispatcher cacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
+        cacheDispatcher.start();
+
+        NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
         networkDispatcher.start();
 
     }
@@ -45,7 +54,7 @@ public class RequestQueue {
 
     public <T> Request<T> add(Request<T> request) {
         request.setSequence(getSequenceNumber());
-        mNetworkQueue.add(request);
+        mCacheQueue.add(request);
         return request;
     }
 

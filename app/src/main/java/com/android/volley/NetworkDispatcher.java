@@ -11,13 +11,15 @@ public class NetworkDispatcher extends Thread {
 
     private final BlockingQueue<Request<?>> mQueue;
     private final Network mNetwork;
+    private final Cache mCache;
     private final ResponseDelivery mDelivery;
     private volatile boolean mQuit = false;
 
-    public NetworkDispatcher(BlockingQueue<Request<?>> queue, Network network,
+    public NetworkDispatcher(BlockingQueue<Request<?>> queue, Network network,Cache cache,
                              ResponseDelivery delivery) {
         mQueue = queue;
         mNetwork = network;
+        mCache = cache;
         mDelivery = delivery;
     }
 
@@ -38,6 +40,9 @@ public class NetworkDispatcher extends Thread {
             try {
                 NetworkResponse networkResponse = mNetwork.performRequest(request);
                 Response<?> response = request.parseNetworkResponse(networkResponse);
+
+                mCache.put(request.getCacheKey(), response.cacheEntry);
+
                 mDelivery.postResponse(request, response);
             } catch (IOException e) {
                 e.printStackTrace();

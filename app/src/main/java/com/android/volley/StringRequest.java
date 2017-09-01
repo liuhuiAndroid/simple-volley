@@ -20,7 +20,7 @@ public class StringRequest extends Request<String>{
     @Override
     protected Response<String> parseNetworkResponse(NetworkResponse response) {
         String parsed = new String(response.data);
-        return Response.success(parsed);
+        return Response.success(parsed,HttpHeaderParser.parseCacheHeaders(response));
     }
 
     @Override

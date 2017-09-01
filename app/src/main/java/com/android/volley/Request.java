@@ -61,6 +61,10 @@ public abstract class Request<T> implements Comparable<Request<T>>{
         return Priority.NORMAL;
     }
 
+    public String getCacheKey() {
+        return mMethod + ":" + mUrl;
+    }
+
     @Override
     public int compareTo(Request<T> other) {
         Priority left = this.getPriority();
